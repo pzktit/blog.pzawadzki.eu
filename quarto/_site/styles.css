@@ -1,0 +1,19 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Pacifico&display=swap');
+
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+
+
+.navbar-title {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900; /* Ensures the icon is displayed in solid style */
+    font-size: 20px;  /* Adjust font size as needed */
+    content: "\f015"; /* Unicode for the home icon */
+   }
+
+.navbar-title::before {
+    content: "\f015"; /* Unicode for the home icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    margin-right: 5px; /* Optional: Adjusts spacing between icon and any adjacent text */
+  }

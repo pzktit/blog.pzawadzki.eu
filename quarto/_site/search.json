@@ -1,0 +1,310 @@
+[
+  {
+    "objectID": "posts/Python/Python.html",
+    "href": "posts/Python/Python.html",
+    "title": "Python Programming Tips",
+    "section": "",
+    "text": "Code\nfrom functools import partial\nfrom datetime import datetime\nimport logging, string, pandas as pd, sqlparse\nfrom fastcore.all import *\nfrom fastcore.docments import *\nfrom IPython.display import Markdown,display, HTML\nimport pandas as pd\n\nfrom pygments import highlight\nfrom pygments.lexers import PythonLexer\nfrom pygments.formatters import HtmlFormatter\n\ndef print_function_source(fn):\n    fn = print_decorator\n    formatter = HtmlFormatter()\n    display(HTML('&lt;style type=\"text/css\"&gt;{}&lt;/style&gt;{}'.format(\n        formatter.get_style_defs('.highlight'),\n        highlight(inspect.getsource(fn), PythonLexer(), formatter))))"
+  },
+  {
+    "objectID": "posts/Python/Python.html#parallel-processing",
+    "href": "posts/Python/Python.html#parallel-processing",
+    "title": "Python Programming Tips",
+    "section": "Parallel Processing",
+    "text": "Parallel Processing\nSee this blog post\n\nDocments\nNice way of documenting code concisely and being able to access info from code. It’s concise, easy to manipulate to display how you want, and easy to read. I much prefer it over the large numpy style docstrings that are big string blocks\n\nfrom fastcore.docments import *\n\ndef distance(pointa:tuple,  # tuple representing the coordinates of the first point (x,y)\n             pointb:tuple=(0,0) # tuple representing the coordinates of the first point (x,y)\n            )-&gt;float: # float representing distance between pointa and pointb\n    '''Calculates the distance between pointa and pointb'''\n    edges = np.abs(np.subtract(pointa,pointa))\n    distance = np.sqrt((edges**2).sum())\n    return distance\n\n\ndocstring(distance)\n\n'Calculates the distance between pointa and pointb'\n\n\n\ndocments(distance)\n\n{ 'pointa': 'tuple representing the coordinates of the first point (x,y)',\n  'pointb': 'tuple representing the coordinates of the first point (x,y)',\n  'return': 'float representing distance between pointa and pointb'}\n\n\n\ndocments(distance,full=True)\n\n{ 'pointa': { 'anno': &lt;class 'tuple'&gt;,\n              'default': &lt;class 'inspect._empty'&gt;,\n              'docment': 'tuple representing the coordinates of the first '\n                         'point (x,y)'},\n  'pointb': { 'anno': &lt;class 'tuple'&gt;,\n              'default': (0, 0),\n              'docment': 'tuple representing the coordinates of the first '\n                         'point (x,y)'},\n  'return': { 'anno': &lt;class 'float'&gt;,\n              'default': &lt;class 'inspect._empty'&gt;,\n              'docment': 'float representing distance between pointa and '\n                         'pointb'}}\n\n\n\n\nTesting\nEveryone agrees testing is important. But not all testing is equal. The needs for unit testing the google code base are not the same as the needs a data scientist needs for building and deploying models, libraries, and most software.\nFastcore is a great tool for most of my testing needs. Fast and simple enough that I can add tests as I build and as I am exploring and building models. I want testing to enhance my development workflow, not be something I have to painstakingly build at the end.\nSometimes simple assert statements are sufficient, but there’s small annoyances. For example, a small change in type can mean a failed test. Sometimes that change in type should cause a failure, sometimes I’m ok if it’s a different type if the values are the same\n\nfrom fastcore.test import *\n\n\ntest_eq([1,2],(1,2))\n\nFor floating points it has handy functionality for that, which is very common in data science. For example, we may want .1 + .1 + .1 == .3 to be true, because they are close enough based on floating point precision\n\n.1 + .1 + .1 == .3\n\nFalse\n\n\n\ntest_close(.1 + .1 + .1, .3)\n\nWe can test that something fails, if there are particular situation we want to ensure raise errors.\n\ndef _fail(): raise Exception(\"foobar\")\ntest_fail(_fail)\n\nWe can test if 2 lists have the same values, just in different orders (convenient for testing some situations with random mini-batches).\n\na = list(range(5))\nb = a.copy()\nb.reverse()\ntest_shuffled(a,b)\n\nThere’s more of course, check out the docs\n\n\nL\nL is a replacement for a list, but with lots of adding functionality. Some of it are functional programming concepts, some is numpy like stuff, and some is just niceities (like cleaner printing).\n\nalist = L(1,2,3,4,3)\n\n\nalist.sort()\nalist.sorted()\n\n(#5) [1,2,3,3,4]\n\n\n\nalist.unique()\n\n(#4) [1,2,3,4]\n\n\n\nalist.filter(lambda x: x &lt; 3)\n\n(#2) [1,2]\n\n\n\nalist.map(lambda x: x * 2)\n\n(#5) [2,4,6,8,6]\n\n\n\n\nAttrDict\nAttrdict is another nice thing from fastcore, that makes dictionaries a bit nicer to use.\n\nregdict = {'a':2,'b':3}\nadict = AttrDict({'a':2,'b':3})\n\n\nadict\n\n{'a': 2, 'b': 3}\n\n\n\nadict.a\n\n2\n\n\n\ndef _fail(): return regdict.a\ntest_fail(_fail)"
+  },
+  {
+    "objectID": "posts/Python/Python.html#filter",
+    "href": "posts/Python/Python.html#filter",
+    "title": "Python Programming Tips",
+    "section": "Filter",
+    "text": "Filter\nFilter is a common higher order function.\n\nL(1,2,3,4,5).filter(lambda x: x&gt;3)\n\n(#2) [4,5]\n\n\nThis is very flexible because we can put filtering logic of any complexity in a function and use that to filter a list of any type."
+  },
+  {
+    "objectID": "posts/Python/Python.html#map",
+    "href": "posts/Python/Python.html#map",
+    "title": "Python Programming Tips",
+    "section": "Map",
+    "text": "Map\nMap is another very common higher order function.\n\nL(1,2,3,4,5).map(lambda x: x**2)\n\n(#5) [1,4,9,16,25]\n\n\nIt is again super flexible because we can apply a function of any complexity to have it be applied and modify each element of the list.\n\nL(1,2,3,4,5).map(lambda x: string.ascii_lowercase[x])\n\n(#5) ['b','c','d','e','f']"
+  },
+  {
+    "objectID": "posts/Python/Python.html#simple-logging",
+    "href": "posts/Python/Python.html#simple-logging",
+    "title": "Python Programming Tips",
+    "section": "Simple Logging",
+    "text": "Simple Logging\nWe could make a function for logging, where we can pass a function in that we want to use for logging (ie info vs warning).\n\ndef log_stuff(msg,fn=logger.info,**kwargs): \n    dt = get_current_time()\n    fn(f\"{dt}|{msg}\")\n    for k,v in kwargs.items(): fn(f\"{dt}|{k}={v}\")\n\n\nlog_stuff('abcd',a=1,b=55)\n\n\n!tail -3 mylog.log\n\nINFO:root:20221106_193211|abcd\nINFO:root:20221106_193211|a=1\nINFO:root:20221106_193211|b=55\n\n\n\nlog_stuff('something might be awry',fn=logger.critical,a=1,b=55)\n\n\n!tail -3 mylog.log\n\nCRITICAL:root:20221106_193211|something might be awry\nCRITICAL:root:20221106_193211|a=1\nCRITICAL:root:20221106_193211|b=55"
+  },
+  {
+    "objectID": "posts/Python/Python.html#file-processor",
+    "href": "posts/Python/Python.html#file-processor",
+    "title": "Python Programming Tips",
+    "section": "File Processor",
+    "text": "File Processor\nYou can also make a generic file processor that you can pass callbacks to. This file processor can include log statements to log what you’re doing, so you can minimize repeating lots of code. For now, we’ll do a simple processor, and callbacks to clean and format a messy sql file.\n\ndef process_file(fpath,callbacks): \n    with open(fpath, \"r\") as f: contents = f.read()\n    for callback in callbacks: contents = callback(contents)\n    return contents"
+  },
+  {
+    "objectID": "posts/Python/Python.html#format-and-clean-sql-file",
+    "href": "posts/Python/Python.html#format-and-clean-sql-file",
+    "title": "Python Programming Tips",
+    "section": "Format and clean SQL file",
+    "text": "Format and clean SQL file\n\nsql_formatter_cb = partial(sqlparse.format,\n                strip_comments=True,comma_first=True,\n                keyword_case='upper', identifier_case='lower',\n                reindent=True, indent_width=4,)\n\n\n\nqrys = process_file('test.sql',[sql_formatter_cb,sqlparse.split])\n\n\ndef sql_pprint(sql): display(Markdown(f\"```sql\\n\\n{sql}\\n\\n```\"))\nfor qry in qrys: sql_pprint(qry)\n\n\nSELECT top 25 *\nFROM some_table;\n\n\n\nSELECT count(1)\nFROM another TABLE ;\n\n\n\nSELECT date_time\n     , mbr_id\n     , transactions\n     , count(1)\nFROM table3\nWHERE date_time &gt; '2021-02-02'\nGROUP BY 1\n       , 2\n       , 3;"
+  },
+  {
+    "objectID": "posts/Python/Python.html#silly-simple-example",
+    "href": "posts/Python/Python.html#silly-simple-example",
+    "title": "Python Programming Tips",
+    "section": "Silly Simple Example",
+    "text": "Silly Simple Example\n\ndef add_another(func):\n    def wrapper(number):\n        print(f\"The decorator took over!\")\n        print(f\"I could log the original number ({number}) here!\")\n        print(f\"Or I could log the original answer ({func(number)}) here!\")\n        return func(number) + 1\n    return wrapper\n    \n@add_another\ndef add_one(number): return number + 1\n\nSo when we use a decorator, the code in the wrapper function is called instead of the original function. Typically the wrapper function calls the original function (otherwise there would be no point in decorating it as you’d just have a new unrelated function)."
+  },
+  {
+    "objectID": "posts/Python/Python.html#useful-example",
+    "href": "posts/Python/Python.html#useful-example",
+    "title": "Python Programming Tips",
+    "section": "Useful Example",
+    "text": "Useful Example\nFor example, maybe you want to print (or log) particular function call times and the args. See this decorator that does just that (and can be used on methods too)\n\nfrom datetime import datetime\n\n\ndef print_decorator(func):\n    def wrapper(*args, **kwargs):\n        print(f\"{datetime.now()}:{func}:args={args}:kwargs={kwargs}\")\n        return func(*args, **kwargs)\n    return wrapper\n\n\n@print_decorator\ndef simple_add(a,b): return a + b\n\n\nsimple_add(2,4)\n\n2022-11-02 14:18:56.635936:&lt;function simple_add&gt;:args=(2, 4):kwargs={}\n\n\n6\n\n\n\n@print_decorator\ndef complex_add(a,b,*args,**kwargs): \n    out = a + b\n    for arg in args: out = out + arg\n    for kwarg in kwargs.values(): out = out + kwarg\n    return out\n\n\ncomplex_add(5,2,3,foo=6,bar=10)\n\n2022-11-02 14:18:57.716085:&lt;function complex_add&gt;:args=(5, 2, 3):kwargs={'foo': 6, 'bar': 10}\n\n\n26"
+  },
+  {
+    "objectID": "posts/Python/Python.html#use-on-existing-functions",
+    "href": "posts/Python/Python.html#use-on-existing-functions",
+    "title": "Python Programming Tips",
+    "section": "Use on Existing Functions",
+    "text": "Use on Existing Functions\nWhat we have seen is applying a decorator to functions we fully define but we can also apply them to previously existing functions like ones we import from a library. This is helpful not just in understanding one way you can extend an existing libraries functionality, but also in understanding what decorators are. They aren’t magical.\nLet’s add logging to pd.DataFrame using our existing decorator so we can see when a dataframe is constructed.\n\nLoggingDataFrame = print_decorator(pd.DataFrame)\ndf = LoggingDataFrame([1,2,3])\n\n2022-11-02 14:53:16.323144:&lt;class 'pandas.core.frame.DataFrame'&gt;:args=([1, 2, 3],):kwargs={}\n\n\n\ndf.head()\n\n\n\n\n\n\n\n\n0\n\n\n\n\n0\n1\n\n\n1\n2\n\n\n2\n3\n\n\n\n\n\n\n\nThe key thing to notice here is that the @ syntax really isn’t doing anything magical. It’s just passing the function into the decorator and using that as the function definition. It’s just syntactic sugar for a higher order function that takes a function and returns a function.\nTo understand why this works, think through what our decorator is doing. 1. It’s a function that takes a function as an argument 2. It creates a new function called wrapper. This wrapper function called the argument passed into it, but also has other code. 3. It returns that function as the output\n\nprint_function_source(print_decorator)\n\ndef print_decorator(func):\n    def wrapper(*args, **kwargs):\n        print(f\"{datetime.now()}:{func}:args={args}:kwargs={kwargs}\")\n        return func(*args, **kwargs)\n    return wrapper"
+  },
+  {
+    "objectID": "posts/Python/Python.html#silly-simple-example-1",
+    "href": "posts/Python/Python.html#silly-simple-example-1",
+    "title": "Python Programming Tips",
+    "section": "Silly Simple Example",
+    "text": "Silly Simple Example\n\nclass aClass: a = 2\n    \nclass bClass(aClass): pass\n    \naClass.a == bClass.a\n\nTrue"
+  },
+  {
+    "objectID": "posts/Python/Python.html#useful-examples",
+    "href": "posts/Python/Python.html#useful-examples",
+    "title": "Python Programming Tips",
+    "section": "Useful Examples",
+    "text": "Useful Examples\nIn many cases there are common things we want to inherit in lots of classes. One example is having access to the date. Often you want this for logging, or printing, or any number of things. By subclassing you don’t have to reformat the date each time in your classes.\n\nclass DateMinuteMixin:\n    date_format='%Y%m%d_%H%M%S'\n    dte = datetime.now()\n\n    @property\n    def date_str(self): return self.dte.strftime(self.date_format)\n\nAnother handy use is to have generic behavior for handling different file types. In this case, we have a mixin where it opens and reads a sql file. Rather than rewriting this code for every class that needs to read a sql file, you can inherit from a class when you need that functionality.\n\n\n\n\n\n\nTip\n\n\n\nYou can define an abstract property like below to let users know that after inheriting this class, they need to define that property. In this case, they define the sql_filepath, and they get the contents of the file for free via the other methods.\n\n\n\nimport abc\n\nclass SqlFileMixin:\n    @abc.abstractproperty\n    def sql_filepath(self):\n        pass\n\n    @property\n    def sql_file(self):\n        return open(self.sql_filepath)\n\n    @property\n    def query(self):\n        return self.sql_file.read()"
+  },
+  {
+    "objectID": "posts/Python/Python.html#silly-simple-example-2",
+    "href": "posts/Python/Python.html#silly-simple-example-2",
+    "title": "Python Programming Tips",
+    "section": "Silly Simple Example",
+    "text": "Silly Simple Example\n\ndef mapper(items,fn):\n    for item in items: yield item\n\n\nit = mapper([2,4,6,8],square)\nit\n\n&lt;generator object mapper&gt;\n\n\n\nnext(it), next(it), next(it)\n\n(2, 4, 6)\n\n\nYou can also process it sequentially in a loop.\n\nfor item in mapper([2,4,6,8],square): \n    print(item)\n\n2\n4\n6\n8"
+  },
+  {
+    "objectID": "posts/Python/Python.html#useful-example-1",
+    "href": "posts/Python/Python.html#useful-example-1",
+    "title": "Python Programming Tips",
+    "section": "Useful Example",
+    "text": "Useful Example\n\nFile Streaming\n\nprint_plus = partial(print,end='\\n++++++\\n')\n\nwith open('test.txt', 'rb') as f:\n    iterator = iter(partial(f.read, 64), b'')\n    print_plus(type(iterator))\n    for block in iterator: print_plus(block)\n\n&lt;class 'callable_iterator'&gt;\n++++++\nb'one\\ntwo\\nthree\\nfour\\nfive\\nsix\\nseven\\neight\\nnine\\nten\\neleven\\ntwelve\\nt'\n++++++\nb'hirteen\\nninety nine thousand nine hundred ninety\\nninety nine tho'\n++++++\nb'usand nine hundred ninety one\\nninety nine thousand nine hundred '\n++++++\nb'ninety two\\nninety nine thousand nine hundred ninety three\\nninety'\n++++++\nb' nine thousand nine hundred ninety four\\nninety nine thousand nin'\n++++++\nb'e hundred ninety five\\nninety nine thousand nine hundred ninety s'\n++++++\nb'ix\\nninety nine thousand nine hundred ninety seven\\nninety nine th'\n++++++\nb'ousand nine hundred ninety eight\\nninety nine thousand nine hundr'\n++++++\nb'ed ninety nine\\n'\n++++++"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Post With Code",
+    "section": "",
+    "text": "This is a post with executable code."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Piotr Zawadzki",
+    "section": "",
+    "text": "blah blah blah"
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "Piotr Zawadzki",
+    "section": "Education",
+    "text": "Education\nAbout this blog"
+  },
+  {
+    "objectID": "about.html#interest",
+    "href": "about.html#interest",
+    "title": "Piotr Zawadzki",
+    "section": "Interest",
+    "text": "Interest\nAbout this blog"
+  },
+  {
+    "objectID": "about.html#publications",
+    "href": "about.html#publications",
+    "title": "Piotr Zawadzki",
+    "section": "Publications",
+    "text": "Publications\nAbout this blog"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "blog akuku",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nMy first Jupyter blog post\n\n\n\nPython\n\n\nProgramming\n\n\n\nJust a test\n\n\n\nPeJotZet@home\n\n\nAug 15, 2024\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\nHarlow Malloc\n\n\nAug 14, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\nTristan O’Malley\n\n\nAug 11, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nPython Programming Tips\n\n\n\nPython\n\n\nProgramming\n\n\n\nA list of handy tips and tricks when programming in python\n\n\n\nIsaac Flath\n\n\nNov 6, 2022\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
+    "objectID": "posts/my-first-post/2024-08-15-my-first-post.html",
+    "href": "posts/my-first-post/2024-08-15-my-first-post.html",
+    "title": "My Notebook Title",
+    "section": "",
+    "text": "import numpy as np\nimport matplotlib.pyplot as plt\n\n# Define the x values from 0 to 4*pi\nx = np.linspace(0, 4 * np.pi, 1000)\n\n# Compute the y values as the sine of x\ny = np.sin(x)\n\n# Create the plot\nplt.figure(figsize=(8, 4))\nplt.plot(x, y, label='sin(x)', color='blue')\n\n# Add labels and title\nplt.title('Sinusoid Plot for $x$ from 0 to $4\\\\pi$')\nplt.xlabel(r'$x$')\nplt.ylabel(r'$\\sin(x)$')\n\n# Add a grid and a legend\nplt.grid(True)\nplt.legend()\n\n# Show the plot\nplt.show()\n\n\n---------------------------------------------------------------------------\nValueError                                Traceback (most recent call last)\nFile /usr/lib/python3.12/site-packages/IPython/core/formatters.py:343, in BaseFormatter.__call__(self, obj)\n    341     pass\n    342 else:\n--&gt; 343     return printer(obj)\n    344 # Finally look for special method names\n    345 method = get_real_method(obj, self.print_method)\n\nFile /usr/lib/python3.12/site-packages/IPython/core/pylabtools.py:170, in print_figure(fig, fmt, bbox_inches, base64, **kwargs)\n    167     from matplotlib.backend_bases import FigureCanvasBase\n    168     FigureCanvasBase(fig)\n--&gt; 170 fig.canvas.print_figure(bytes_io, **kw)\n    171 data = bytes_io.getvalue()\n    172 if fmt == 'svg':\n\nFile /usr/lib/python3.12/site-packages/matplotlib/backend_bases.py:2164, in FigureCanvasBase.print_figure(self, filename, dpi, facecolor, edgecolor, orientation, format, bbox_inches, pad_inches, bbox_extra_artists, backend, **kwargs)\n   2161     # we do this instead of `self.figure.draw_without_rendering`\n   2162     # so that we can inject the orientation\n   2163     with getattr(renderer, \"_draw_disabled\", nullcontext)():\n-&gt; 2164         self.figure.draw(renderer)\n   2165 if bbox_inches:\n   2166     if bbox_inches == \"tight\":\n\nFile /usr/lib/python3.12/site-packages/matplotlib/artist.py:95, in _finalize_rasterization.&lt;locals&gt;.draw_wrapper(artist, renderer, *args, **kwargs)\n     93 @wraps(draw)\n     94 def draw_wrapper(artist, renderer, *args, **kwargs):\n---&gt; 95     result = draw(artist, renderer, *args, **kwargs)\n     96     if renderer._rasterizing:\n     97         renderer.stop_rasterizing()\n\nFile /usr/lib/python3.12/site-packages/matplotlib/artist.py:72, in allow_rasterization.&lt;locals&gt;.draw_wrapper(artist, renderer)\n     69     if artist.get_agg_filter() is not None:\n     70         renderer.start_filter()\n---&gt; 72     return draw(artist, renderer)\n     73 finally:\n     74     if artist.get_agg_filter() is not None:\n\nFile /usr/lib/python3.12/site-packages/matplotlib/figure.py:3154, in Figure.draw(self, renderer)\n   3151         # ValueError can occur when resizing a window.\n   3153 self.patch.draw(renderer)\n-&gt; 3154 mimage._draw_list_compositing_images(\n   3155     renderer, self, artists, self.suppressComposite)\n   3157 for sfig in self.subfigs:\n   3158     sfig.draw(renderer)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/image.py:132, in _draw_list_compositing_images(renderer, parent, artists, suppress_composite)\n    130 if not_composite or not has_images:\n    131     for a in artists:\n--&gt; 132         a.draw(renderer)\n    133 else:\n    134     # Composite any adjacent images together\n    135     image_group = []\n\nFile /usr/lib/python3.12/site-packages/matplotlib/artist.py:72, in allow_rasterization.&lt;locals&gt;.draw_wrapper(artist, renderer)\n     69     if artist.get_agg_filter() is not None:\n     70         renderer.start_filter()\n---&gt; 72     return draw(artist, renderer)\n     73 finally:\n     74     if artist.get_agg_filter() is not None:\n\nFile /usr/lib/python3.12/site-packages/matplotlib/axes/_base.py:3034, in _AxesBase.draw(self, renderer)\n   3031     for spine in self.spines.values():\n   3032         artists.remove(spine)\n-&gt; 3034 self._update_title_position(renderer)\n   3036 if not self.axison:\n   3037     for _axis in self._axis_map.values():\n\nFile /usr/lib/python3.12/site-packages/matplotlib/axes/_base.py:2988, in _AxesBase._update_title_position(self, renderer)\n   2986     _log.debug('top of Axes not in the figure, so title not moved')\n   2987     return\n-&gt; 2988 if title.get_window_extent(renderer).ymin &lt; top:\n   2989     _, y = self.transAxes.inverted().transform((0, top))\n   2990     title.set_position((x, y))\n\nFile /usr/lib/python3.12/site-packages/matplotlib/text.py:956, in Text.get_window_extent(self, renderer, dpi)\n    951     raise RuntimeError(\n    952         \"Cannot get window extent of text w/o renderer. You likely \"\n    953         \"want to call 'figure.draw_without_rendering()' first.\")\n    955 with cbook._setattr_cm(self.figure, dpi=dpi):\n--&gt; 956     bbox, info, descent = self._get_layout(self._renderer)\n    957     x, y = self.get_unitless_position()\n    958     x, y = self.get_transform().transform((x, y))\n\nFile /usr/lib/python3.12/site-packages/matplotlib/text.py:381, in Text._get_layout(self, renderer)\n    379 clean_line, ismath = self._preprocess_math(line)\n    380 if clean_line:\n--&gt; 381     w, h, d = _get_text_metrics_with_cache(\n    382         renderer, clean_line, self._fontproperties,\n    383         ismath=ismath, dpi=self.figure.dpi)\n    384 else:\n    385     w = h = d = 0\n\nFile /usr/lib/python3.12/site-packages/matplotlib/text.py:69, in _get_text_metrics_with_cache(renderer, text, fontprop, ismath, dpi)\n     66 \"\"\"Call ``renderer.get_text_width_height_descent``, caching the results.\"\"\"\n     67 # Cached based on a copy of fontprop so that later in-place mutations of\n     68 # the passed-in argument do not mess up the cache.\n---&gt; 69 return _get_text_metrics_with_cache_impl(\n     70     weakref.ref(renderer), text, fontprop.copy(), ismath, dpi)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/text.py:77, in _get_text_metrics_with_cache_impl(renderer_ref, text, fontprop, ismath, dpi)\n     73 @functools.lru_cache(4096)\n     74 def _get_text_metrics_with_cache_impl(\n     75         renderer_ref, text, fontprop, ismath, dpi):\n     76     # dpi is unused, but participates in cache invalidation (via the renderer).\n---&gt; 77     return renderer_ref().get_text_width_height_descent(text, fontprop, ismath)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/backends/backend_agg.py:217, in RendererAgg.get_text_width_height_descent(self, s, prop, ismath)\n    213     return super().get_text_width_height_descent(s, prop, ismath)\n    215 if ismath:\n    216     ox, oy, width, height, descent, font_image = \\\n--&gt; 217         self.mathtext_parser.parse(s, self.dpi, prop)\n    218     return width, height, descent\n    220 font = self._prepare_font(prop)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/mathtext.py:79, in MathTextParser.parse(self, s, dpi, prop, antialiased)\n     77 prop = prop.copy() if prop is not None else None\n     78 antialiased = mpl._val_or_rc(antialiased, 'text.antialiased')\n---&gt; 79 return self._parse_cached(s, dpi, prop, antialiased)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/mathtext.py:100, in MathTextParser._parse_cached(self, s, dpi, prop, antialiased)\n     97 if self._parser is None:  # Cache the parser globally.\n     98     self.__class__._parser = _mathtext.Parser()\n--&gt; 100 box = self._parser.parse(s, fontset, fontsize, dpi)\n    101 output = _mathtext.ship(box)\n    102 if self._output_type == \"vector\":\n\nFile /usr/lib/python3.12/site-packages/matplotlib/_mathtext.py:2165, in Parser.parse(self, s, fonts_object, fontsize, dpi)\n   2162     result = self._expression.parseString(s)\n   2163 except ParseBaseException as err:\n   2164     # explain becomes a plain method on pyparsing 3 (err.explain(0)).\n-&gt; 2165     raise ValueError(\"\\n\" + ParseException.explain(err, 0)) from None\n   2166 self._state_stack = []\n   2167 self._in_subscript_or_superscript = False\n\nValueError: \nSinusoid Plot for $x$ from 0 to $4\\\\pi$\n                                ^\nParseException: Expected end of text, found '$'  (at char 32), (line:1, col:33)\n\n\n\n&lt;Figure size 800x400 with 1 Axes&gt;"
+  },
+  {
+    "objectID": "posts/my-first-post/2024-08-15-my-first-post.html#hello-world-example",
+    "href": "posts/my-first-post/2024-08-15-my-first-post.html#hello-world-example",
+    "title": "My Notebook Title",
+    "section": "",
+    "text": "import numpy as np\nimport matplotlib.pyplot as plt\n\n# Define the x values from 0 to 4*pi\nx = np.linspace(0, 4 * np.pi, 1000)\n\n# Compute the y values as the sine of x\ny = np.sin(x)\n\n# Create the plot\nplt.figure(figsize=(8, 4))\nplt.plot(x, y, label='sin(x)', color='blue')\n\n# Add labels and title\nplt.title('Sinusoid Plot for $x$ from 0 to $4\\\\pi$')\nplt.xlabel(r'$x$')\nplt.ylabel(r'$\\sin(x)$')\n\n# Add a grid and a legend\nplt.grid(True)\nplt.legend()\n\n# Show the plot\nplt.show()\n\n\n---------------------------------------------------------------------------\nValueError                                Traceback (most recent call last)\nFile /usr/lib/python3.12/site-packages/IPython/core/formatters.py:343, in BaseFormatter.__call__(self, obj)\n    341     pass\n    342 else:\n--&gt; 343     return printer(obj)\n    344 # Finally look for special method names\n    345 method = get_real_method(obj, self.print_method)\n\nFile /usr/lib/python3.12/site-packages/IPython/core/pylabtools.py:170, in print_figure(fig, fmt, bbox_inches, base64, **kwargs)\n    167     from matplotlib.backend_bases import FigureCanvasBase\n    168     FigureCanvasBase(fig)\n--&gt; 170 fig.canvas.print_figure(bytes_io, **kw)\n    171 data = bytes_io.getvalue()\n    172 if fmt == 'svg':\n\nFile /usr/lib/python3.12/site-packages/matplotlib/backend_bases.py:2164, in FigureCanvasBase.print_figure(self, filename, dpi, facecolor, edgecolor, orientation, format, bbox_inches, pad_inches, bbox_extra_artists, backend, **kwargs)\n   2161     # we do this instead of `self.figure.draw_without_rendering`\n   2162     # so that we can inject the orientation\n   2163     with getattr(renderer, \"_draw_disabled\", nullcontext)():\n-&gt; 2164         self.figure.draw(renderer)\n   2165 if bbox_inches:\n   2166     if bbox_inches == \"tight\":\n\nFile /usr/lib/python3.12/site-packages/matplotlib/artist.py:95, in _finalize_rasterization.&lt;locals&gt;.draw_wrapper(artist, renderer, *args, **kwargs)\n     93 @wraps(draw)\n     94 def draw_wrapper(artist, renderer, *args, **kwargs):\n---&gt; 95     result = draw(artist, renderer, *args, **kwargs)\n     96     if renderer._rasterizing:\n     97         renderer.stop_rasterizing()\n\nFile /usr/lib/python3.12/site-packages/matplotlib/artist.py:72, in allow_rasterization.&lt;locals&gt;.draw_wrapper(artist, renderer)\n     69     if artist.get_agg_filter() is not None:\n     70         renderer.start_filter()\n---&gt; 72     return draw(artist, renderer)\n     73 finally:\n     74     if artist.get_agg_filter() is not None:\n\nFile /usr/lib/python3.12/site-packages/matplotlib/figure.py:3154, in Figure.draw(self, renderer)\n   3151         # ValueError can occur when resizing a window.\n   3153 self.patch.draw(renderer)\n-&gt; 3154 mimage._draw_list_compositing_images(\n   3155     renderer, self, artists, self.suppressComposite)\n   3157 for sfig in self.subfigs:\n   3158     sfig.draw(renderer)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/image.py:132, in _draw_list_compositing_images(renderer, parent, artists, suppress_composite)\n    130 if not_composite or not has_images:\n    131     for a in artists:\n--&gt; 132         a.draw(renderer)\n    133 else:\n    134     # Composite any adjacent images together\n    135     image_group = []\n\nFile /usr/lib/python3.12/site-packages/matplotlib/artist.py:72, in allow_rasterization.&lt;locals&gt;.draw_wrapper(artist, renderer)\n     69     if artist.get_agg_filter() is not None:\n     70         renderer.start_filter()\n---&gt; 72     return draw(artist, renderer)\n     73 finally:\n     74     if artist.get_agg_filter() is not None:\n\nFile /usr/lib/python3.12/site-packages/matplotlib/axes/_base.py:3034, in _AxesBase.draw(self, renderer)\n   3031     for spine in self.spines.values():\n   3032         artists.remove(spine)\n-&gt; 3034 self._update_title_position(renderer)\n   3036 if not self.axison:\n   3037     for _axis in self._axis_map.values():\n\nFile /usr/lib/python3.12/site-packages/matplotlib/axes/_base.py:2988, in _AxesBase._update_title_position(self, renderer)\n   2986     _log.debug('top of Axes not in the figure, so title not moved')\n   2987     return\n-&gt; 2988 if title.get_window_extent(renderer).ymin &lt; top:\n   2989     _, y = self.transAxes.inverted().transform((0, top))\n   2990     title.set_position((x, y))\n\nFile /usr/lib/python3.12/site-packages/matplotlib/text.py:956, in Text.get_window_extent(self, renderer, dpi)\n    951     raise RuntimeError(\n    952         \"Cannot get window extent of text w/o renderer. You likely \"\n    953         \"want to call 'figure.draw_without_rendering()' first.\")\n    955 with cbook._setattr_cm(self.figure, dpi=dpi):\n--&gt; 956     bbox, info, descent = self._get_layout(self._renderer)\n    957     x, y = self.get_unitless_position()\n    958     x, y = self.get_transform().transform((x, y))\n\nFile /usr/lib/python3.12/site-packages/matplotlib/text.py:381, in Text._get_layout(self, renderer)\n    379 clean_line, ismath = self._preprocess_math(line)\n    380 if clean_line:\n--&gt; 381     w, h, d = _get_text_metrics_with_cache(\n    382         renderer, clean_line, self._fontproperties,\n    383         ismath=ismath, dpi=self.figure.dpi)\n    384 else:\n    385     w = h = d = 0\n\nFile /usr/lib/python3.12/site-packages/matplotlib/text.py:69, in _get_text_metrics_with_cache(renderer, text, fontprop, ismath, dpi)\n     66 \"\"\"Call ``renderer.get_text_width_height_descent``, caching the results.\"\"\"\n     67 # Cached based on a copy of fontprop so that later in-place mutations of\n     68 # the passed-in argument do not mess up the cache.\n---&gt; 69 return _get_text_metrics_with_cache_impl(\n     70     weakref.ref(renderer), text, fontprop.copy(), ismath, dpi)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/text.py:77, in _get_text_metrics_with_cache_impl(renderer_ref, text, fontprop, ismath, dpi)\n     73 @functools.lru_cache(4096)\n     74 def _get_text_metrics_with_cache_impl(\n     75         renderer_ref, text, fontprop, ismath, dpi):\n     76     # dpi is unused, but participates in cache invalidation (via the renderer).\n---&gt; 77     return renderer_ref().get_text_width_height_descent(text, fontprop, ismath)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/backends/backend_agg.py:217, in RendererAgg.get_text_width_height_descent(self, s, prop, ismath)\n    213     return super().get_text_width_height_descent(s, prop, ismath)\n    215 if ismath:\n    216     ox, oy, width, height, descent, font_image = \\\n--&gt; 217         self.mathtext_parser.parse(s, self.dpi, prop)\n    218     return width, height, descent\n    220 font = self._prepare_font(prop)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/mathtext.py:79, in MathTextParser.parse(self, s, dpi, prop, antialiased)\n     77 prop = prop.copy() if prop is not None else None\n     78 antialiased = mpl._val_or_rc(antialiased, 'text.antialiased')\n---&gt; 79 return self._parse_cached(s, dpi, prop, antialiased)\n\nFile /usr/lib/python3.12/site-packages/matplotlib/mathtext.py:100, in MathTextParser._parse_cached(self, s, dpi, prop, antialiased)\n     97 if self._parser is None:  # Cache the parser globally.\n     98     self.__class__._parser = _mathtext.Parser()\n--&gt; 100 box = self._parser.parse(s, fontset, fontsize, dpi)\n    101 output = _mathtext.ship(box)\n    102 if self._output_type == \"vector\":\n\nFile /usr/lib/python3.12/site-packages/matplotlib/_mathtext.py:2165, in Parser.parse(self, s, fonts_object, fontsize, dpi)\n   2162     result = self._expression.parseString(s)\n   2163 except ParseBaseException as err:\n   2164     # explain becomes a plain method on pyparsing 3 (err.explain(0)).\n-&gt; 2165     raise ValueError(\"\\n\" + ParseException.explain(err, 0)) from None\n   2166 self._state_stack = []\n   2167 self._in_subscript_or_superscript = False\n\nValueError: \nSinusoid Plot for $x$ from 0 to $4\\\\pi$\n                                ^\nParseException: Expected end of text, found '$'  (at char 32), (line:1, col:33)\n\n\n\n&lt;Figure size 800x400 with 1 Axes&gt;"
+  },
+  {
+    "objectID": "posts/my-first-post/my-first-post.html",
+    "href": "posts/my-first-post/my-first-post.html",
+    "title": "My first Jupyter blog post",
+    "section": "",
+    "text": "This is example of calculating \\(f(x)=\\sin(x)\\). This function can be expanded as \\[\n\\sin(x) = x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\frac{x^7}{7!} + \\cdots\n=  \\sum_{n=0}^{\\infty} \\frac{(-1)^n x^{2n+1}}{(2n+1)!}.\n\\] The visual representation of the function is shown on a plot below.\n\n\nCode\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom IPython.display import display, HTML\n\n# Define the x values from 0 to 4*pi\nx = np.linspace(0, 4 * np.pi, 1000)\n\n# Compute the y values as the sine of x\ny = np.sin(x)\n\n# Create the plot\nplt.figure(figsize=(8, 4))\nplt.plot(x, y, label='sin(x)', color='blue')\n\n# Add labels and title\nplt.title('Sinusoid Plot for $x$ from 0 to $4\\\\pi$')\nplt.xlabel(r'$x$')\nplt.ylabel(r'$\\sin(x)$')\n\n# Add a grid and a legend\nplt.grid(True)\nplt.legend()\n\n# Show the plot\nplt.show()\n\ndisplay(HTML(\"\"\"\n&lt;div&gt;\n  &lt;p id=\"plot-label\"&gt;Figure 1: Sine Wave Plot.&lt;/p&gt;\n&lt;/div&gt;\n\"\"\"))\n\n\n\n\n\n\n\n\n\n\n\n(a) Simple demo plot\n\n\n\n\n\n\n\n\n\n  Figure 1: Sine Wave Plot.\n\n\n\n(b)\n\n\n\n\n\nFigure 1"
+  },
+  {
+    "objectID": "posts/my-first-post/my-first-post.html#hello-world-example",
+    "href": "posts/my-first-post/my-first-post.html#hello-world-example",
+    "title": "My first Jupyter blog post",
+    "section": "",
+    "text": "This is example of calculating \\(f(x)=\\sin(x)\\). This function can be expanded as \\[\n\\sin(x) = x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\frac{x^7}{7!} + \\cdots\n=  \\sum_{n=0}^{\\infty} \\frac{(-1)^n x^{2n+1}}{(2n+1)!}.\n\\] The visual representation of the function is shown on a plot below.\n\n\nCode\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom IPython.display import display, HTML\n\n# Define the x values from 0 to 4*pi\nx = np.linspace(0, 4 * np.pi, 1000)\n\n# Compute the y values as the sine of x\ny = np.sin(x)\n\n# Create the plot\nplt.figure(figsize=(8, 4))\nplt.plot(x, y, label='sin(x)', color='blue')\n\n# Add labels and title\nplt.title('Sinusoid Plot for $x$ from 0 to $4\\\\pi$')\nplt.xlabel(r'$x$')\nplt.ylabel(r'$\\sin(x)$')\n\n# Add a grid and a legend\nplt.grid(True)\nplt.legend()\n\n# Show the plot\nplt.show()\n\ndisplay(HTML(\"\"\"\n&lt;div&gt;\n  &lt;p id=\"plot-label\"&gt;Figure 1: Sine Wave Plot.&lt;/p&gt;\n&lt;/div&gt;\n\"\"\"))\n\n\n\n\n\n\n\n\n\n\n\n(a) Simple demo plot\n\n\n\n\n\n\n\n\n\n  Figure 1: Sine Wave Plot.\n\n\n\n(b)\n\n\n\n\n\nFigure 1"
+  },
+  {
+    "objectID": "posts/my-first-post/my-first-post.html#plot-description",
+    "href": "posts/my-first-post/my-first-post.html#plot-description",
+    "title": "My first Jupyter blog post",
+    "section": "2 Plot Description",
+    "text": "2 Plot Description\nThe plot below (Figure 1) shows the sine wave function. For details, see Figure 1. Rysunek a\nGo to Figure 1: Sine Wave Plot"
+  },
+  {
+    "objectID": "shorts/First/First.html",
+    "href": "shorts/First/First.html",
+    "title": "Short post",
+    "section": "",
+    "text": "This is example of calculating \\(f(x)=\\sin(x)\\). This function can be expanded as \\[\n\\sin(x) = x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\frac{x^7}{7!} + \\cdots\n=  \\sum_{n=0}^{\\infty} \\frac{(-1)^n x^{2n+1}}{(2n+1)!}.\n\\] The visual representation of the function is shown on a plot below.\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom IPython.display import display, HTML\n\n# Define the x values from 0 to 4*pi\nx = np.linspace(0, 4 * np.pi, 1000)\n\n# Compute the y values as the sine of x\ny = np.sin(x)\n\n# Create the plot\nplt.figure(figsize=(8, 4))\nplt.plot(x, y, label='sin(x)', color='blue')\n\n# Add labels and title\nplt.title('Sinusoid Plot for $x$ from 0 to $4\\\\pi$')\nplt.xlabel(r'$x$')\nplt.ylabel(r'$\\sin(x)$')\n\n# Add a grid and a legend\nplt.grid(True)\nplt.legend()\n\n# Show the plot\nplt.show()\n\ndisplay(HTML(\"\"\"\n&lt;div&gt;\n  &lt;p id=\"plot-label\"&gt;Figure 1: Sine Wave Plot.&lt;/p&gt;\n&lt;/div&gt;\n\"\"\"))\n\n\n\n\n\n\n\n\n\n\n(a) Simple demo plot\n\n\n\n\n\n\n\n\n\n  Figure 1: Sine Wave Plot.\n\n\n\n(b)\n\n\n\n\n\nFigure 1"
+  },
+  {
+    "objectID": "shorts/First/First.html#hello-world-example",
+    "href": "shorts/First/First.html#hello-world-example",
+    "title": "Short post",
+    "section": "",
+    "text": "This is example of calculating \\(f(x)=\\sin(x)\\). This function can be expanded as \\[\n\\sin(x) = x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\frac{x^7}{7!} + \\cdots\n=  \\sum_{n=0}^{\\infty} \\frac{(-1)^n x^{2n+1}}{(2n+1)!}.\n\\] The visual representation of the function is shown on a plot below.\n\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom IPython.display import display, HTML\n\n# Define the x values from 0 to 4*pi\nx = np.linspace(0, 4 * np.pi, 1000)\n\n# Compute the y values as the sine of x\ny = np.sin(x)\n\n# Create the plot\nplt.figure(figsize=(8, 4))\nplt.plot(x, y, label='sin(x)', color='blue')\n\n# Add labels and title\nplt.title('Sinusoid Plot for $x$ from 0 to $4\\\\pi$')\nplt.xlabel(r'$x$')\nplt.ylabel(r'$\\sin(x)$')\n\n# Add a grid and a legend\nplt.grid(True)\nplt.legend()\n\n# Show the plot\nplt.show()\n\ndisplay(HTML(\"\"\"\n&lt;div&gt;\n  &lt;p id=\"plot-label\"&gt;Figure 1: Sine Wave Plot.&lt;/p&gt;\n&lt;/div&gt;\n\"\"\"))\n\n\n\n\n\n\n\n\n\n\n(a) Simple demo plot\n\n\n\n\n\n\n\n\n\n  Figure 1: Sine Wave Plot.\n\n\n\n(b)\n\n\n\n\n\nFigure 1"
+  },
+  {
+    "objectID": "shorts/First/First.html#plot-description",
+    "href": "shorts/First/First.html#plot-description",
+    "title": "Short post",
+    "section": "Plot Description",
+    "text": "Plot Description\nThe plot below (Figure 1) shows the sine wave function. For details, see Figure 1. Rysunek a\nGo to Figure 1: Sine Wave Plot"
+  },
+  {
+    "objectID": "shorts/index.html",
+    "href": "shorts/index.html",
+    "title": "Shorts akuku",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\n\n\n\n\n \n\n\n \n\n\n \n\n\n\n\nAug 15, 2024\n\n\nShort post\n\n\nPeJotZet@home \n\n\n\n\nNov 6, 2022\n\n\nPython Programming Tips\n\n\nIsaac Flath\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "shorts/Python/Python.html",
+    "href": "shorts/Python/Python.html",
+    "title": "Python Programming Tips",
+    "section": "",
+    "text": "Code\nfrom functools import partial\nfrom datetime import datetime\nimport logging, string, pandas as pd, sqlparse\nfrom fastcore.all import *\nfrom fastcore.docments import *\nfrom IPython.display import Markdown,display, HTML\nimport pandas as pd\n\nfrom pygments import highlight\nfrom pygments.lexers import PythonLexer\nfrom pygments.formatters import HtmlFormatter\n\ndef print_function_source(fn):\n    fn = print_decorator\n    formatter = HtmlFormatter()\n    display(HTML('&lt;style type=\"text/css\"&gt;{}&lt;/style&gt;{}'.format(\n        formatter.get_style_defs('.highlight'),\n        highlight(inspect.getsource(fn), PythonLexer(), formatter))))"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#parallel-processing",
+    "href": "shorts/Python/Python.html#parallel-processing",
+    "title": "Python Programming Tips",
+    "section": "Parallel Processing",
+    "text": "Parallel Processing\nSee this blog post\n\nDocments\nNice way of documenting code concisely and being able to access info from code. It’s concise, easy to manipulate to display how you want, and easy to read. I much prefer it over the large numpy style docstrings that are big string blocks\n\nfrom fastcore.docments import *\n\ndef distance(pointa:tuple,  # tuple representing the coordinates of the first point (x,y)\n             pointb:tuple=(0,0) # tuple representing the coordinates of the first point (x,y)\n            )-&gt;float: # float representing distance between pointa and pointb\n    '''Calculates the distance between pointa and pointb'''\n    edges = np.abs(np.subtract(pointa,pointa))\n    distance = np.sqrt((edges**2).sum())\n    return distance\n\n\ndocstring(distance)\n\n'Calculates the distance between pointa and pointb'\n\n\n\ndocments(distance)\n\n{ 'pointa': 'tuple representing the coordinates of the first point (x,y)',\n  'pointb': 'tuple representing the coordinates of the first point (x,y)',\n  'return': 'float representing distance between pointa and pointb'}\n\n\n\ndocments(distance,full=True)\n\n{ 'pointa': { 'anno': &lt;class 'tuple'&gt;,\n              'default': &lt;class 'inspect._empty'&gt;,\n              'docment': 'tuple representing the coordinates of the first '\n                         'point (x,y)'},\n  'pointb': { 'anno': &lt;class 'tuple'&gt;,\n              'default': (0, 0),\n              'docment': 'tuple representing the coordinates of the first '\n                         'point (x,y)'},\n  'return': { 'anno': &lt;class 'float'&gt;,\n              'default': &lt;class 'inspect._empty'&gt;,\n              'docment': 'float representing distance between pointa and '\n                         'pointb'}}\n\n\n\n\nTesting\nEveryone agrees testing is important. But not all testing is equal. The needs for unit testing the google code base are not the same as the needs a data scientist needs for building and deploying models, libraries, and most software.\nFastcore is a great tool for most of my testing needs. Fast and simple enough that I can add tests as I build and as I am exploring and building models. I want testing to enhance my development workflow, not be something I have to painstakingly build at the end.\nSometimes simple assert statements are sufficient, but there’s small annoyances. For example, a small change in type can mean a failed test. Sometimes that change in type should cause a failure, sometimes I’m ok if it’s a different type if the values are the same\n\nfrom fastcore.test import *\n\n\ntest_eq([1,2],(1,2))\n\nFor floating points it has handy functionality for that, which is very common in data science. For example, we may want .1 + .1 + .1 == .3 to be true, because they are close enough based on floating point precision\n\n.1 + .1 + .1 == .3\n\nFalse\n\n\n\ntest_close(.1 + .1 + .1, .3)\n\nWe can test that something fails, if there are particular situation we want to ensure raise errors.\n\ndef _fail(): raise Exception(\"foobar\")\ntest_fail(_fail)\n\nWe can test if 2 lists have the same values, just in different orders (convenient for testing some situations with random mini-batches).\n\na = list(range(5))\nb = a.copy()\nb.reverse()\ntest_shuffled(a,b)\n\nThere’s more of course, check out the docs\n\n\nL\nL is a replacement for a list, but with lots of adding functionality. Some of it are functional programming concepts, some is numpy like stuff, and some is just niceities (like cleaner printing).\n\nalist = L(1,2,3,4,3)\n\n\nalist.sort()\nalist.sorted()\n\n(#5) [1,2,3,3,4]\n\n\n\nalist.unique()\n\n(#4) [1,2,3,4]\n\n\n\nalist.filter(lambda x: x &lt; 3)\n\n(#2) [1,2]\n\n\n\nalist.map(lambda x: x * 2)\n\n(#5) [2,4,6,8,6]\n\n\n\n\nAttrDict\nAttrdict is another nice thing from fastcore, that makes dictionaries a bit nicer to use.\n\nregdict = {'a':2,'b':3}\nadict = AttrDict({'a':2,'b':3})\n\n\nadict\n\n{'a': 2, 'b': 3}\n\n\n\nadict.a\n\n2\n\n\n\ndef _fail(): return regdict.a\ntest_fail(_fail)"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#filter",
+    "href": "shorts/Python/Python.html#filter",
+    "title": "Python Programming Tips",
+    "section": "Filter",
+    "text": "Filter\nFilter is a common higher order function.\n\nL(1,2,3,4,5).filter(lambda x: x&gt;3)\n\n(#2) [4,5]\n\n\nThis is very flexible because we can put filtering logic of any complexity in a function and use that to filter a list of any type."
+  },
+  {
+    "objectID": "shorts/Python/Python.html#map",
+    "href": "shorts/Python/Python.html#map",
+    "title": "Python Programming Tips",
+    "section": "Map",
+    "text": "Map\nMap is another very common higher order function.\n\nL(1,2,3,4,5).map(lambda x: x**2)\n\n(#5) [1,4,9,16,25]\n\n\nIt is again super flexible because we can apply a function of any complexity to have it be applied and modify each element of the list.\n\nL(1,2,3,4,5).map(lambda x: string.ascii_lowercase[x])\n\n(#5) ['b','c','d','e','f']"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#simple-logging",
+    "href": "shorts/Python/Python.html#simple-logging",
+    "title": "Python Programming Tips",
+    "section": "Simple Logging",
+    "text": "Simple Logging\nWe could make a function for logging, where we can pass a function in that we want to use for logging (ie info vs warning).\n\ndef log_stuff(msg,fn=logger.info,**kwargs): \n    dt = get_current_time()\n    fn(f\"{dt}|{msg}\")\n    for k,v in kwargs.items(): fn(f\"{dt}|{k}={v}\")\n\n\nlog_stuff('abcd',a=1,b=55)\n\n\n!tail -3 mylog.log\n\nINFO:root:20221106_193211|abcd\nINFO:root:20221106_193211|a=1\nINFO:root:20221106_193211|b=55\n\n\n\nlog_stuff('something might be awry',fn=logger.critical,a=1,b=55)\n\n\n!tail -3 mylog.log\n\nCRITICAL:root:20221106_193211|something might be awry\nCRITICAL:root:20221106_193211|a=1\nCRITICAL:root:20221106_193211|b=55"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#file-processor",
+    "href": "shorts/Python/Python.html#file-processor",
+    "title": "Python Programming Tips",
+    "section": "File Processor",
+    "text": "File Processor\nYou can also make a generic file processor that you can pass callbacks to. This file processor can include log statements to log what you’re doing, so you can minimize repeating lots of code. For now, we’ll do a simple processor, and callbacks to clean and format a messy sql file.\n\ndef process_file(fpath,callbacks): \n    with open(fpath, \"r\") as f: contents = f.read()\n    for callback in callbacks: contents = callback(contents)\n    return contents"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#format-and-clean-sql-file",
+    "href": "shorts/Python/Python.html#format-and-clean-sql-file",
+    "title": "Python Programming Tips",
+    "section": "Format and clean SQL file",
+    "text": "Format and clean SQL file\n\nsql_formatter_cb = partial(sqlparse.format,\n                strip_comments=True,comma_first=True,\n                keyword_case='upper', identifier_case='lower',\n                reindent=True, indent_width=4,)\n\n\n\nqrys = process_file('test.sql',[sql_formatter_cb,sqlparse.split])\n\n\ndef sql_pprint(sql): display(Markdown(f\"```sql\\n\\n{sql}\\n\\n```\"))\nfor qry in qrys: sql_pprint(qry)\n\n\nSELECT top 25 *\nFROM some_table;\n\n\n\nSELECT count(1)\nFROM another TABLE ;\n\n\n\nSELECT date_time\n     , mbr_id\n     , transactions\n     , count(1)\nFROM table3\nWHERE date_time &gt; '2021-02-02'\nGROUP BY 1\n       , 2\n       , 3;"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#silly-simple-example",
+    "href": "shorts/Python/Python.html#silly-simple-example",
+    "title": "Python Programming Tips",
+    "section": "Silly Simple Example",
+    "text": "Silly Simple Example\n\ndef add_another(func):\n    def wrapper(number):\n        print(f\"The decorator took over!\")\n        print(f\"I could log the original number ({number}) here!\")\n        print(f\"Or I could log the original answer ({func(number)}) here!\")\n        return func(number) + 1\n    return wrapper\n    \n@add_another\ndef add_one(number): return number + 1\n\nSo when we use a decorator, the code in the wrapper function is called instead of the original function. Typically the wrapper function calls the original function (otherwise there would be no point in decorating it as you’d just have a new unrelated function)."
+  },
+  {
+    "objectID": "shorts/Python/Python.html#useful-example",
+    "href": "shorts/Python/Python.html#useful-example",
+    "title": "Python Programming Tips",
+    "section": "Useful Example",
+    "text": "Useful Example\nFor example, maybe you want to print (or log) particular function call times and the args. See this decorator that does just that (and can be used on methods too)\n\nfrom datetime import datetime\n\n\ndef print_decorator(func):\n    def wrapper(*args, **kwargs):\n        print(f\"{datetime.now()}:{func}:args={args}:kwargs={kwargs}\")\n        return func(*args, **kwargs)\n    return wrapper\n\n\n@print_decorator\ndef simple_add(a,b): return a + b\n\n\nsimple_add(2,4)\n\n2022-11-02 14:18:56.635936:&lt;function simple_add&gt;:args=(2, 4):kwargs={}\n\n\n6\n\n\n\n@print_decorator\ndef complex_add(a,b,*args,**kwargs): \n    out = a + b\n    for arg in args: out = out + arg\n    for kwarg in kwargs.values(): out = out + kwarg\n    return out\n\n\ncomplex_add(5,2,3,foo=6,bar=10)\n\n2022-11-02 14:18:57.716085:&lt;function complex_add&gt;:args=(5, 2, 3):kwargs={'foo': 6, 'bar': 10}\n\n\n26"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#use-on-existing-functions",
+    "href": "shorts/Python/Python.html#use-on-existing-functions",
+    "title": "Python Programming Tips",
+    "section": "Use on Existing Functions",
+    "text": "Use on Existing Functions\nWhat we have seen is applying a decorator to functions we fully define but we can also apply them to previously existing functions like ones we import from a library. This is helpful not just in understanding one way you can extend an existing libraries functionality, but also in understanding what decorators are. They aren’t magical.\nLet’s add logging to pd.DataFrame using our existing decorator so we can see when a dataframe is constructed.\n\nLoggingDataFrame = print_decorator(pd.DataFrame)\ndf = LoggingDataFrame([1,2,3])\n\n2022-11-02 14:53:16.323144:&lt;class 'pandas.core.frame.DataFrame'&gt;:args=([1, 2, 3],):kwargs={}\n\n\n\ndf.head()\n\n\n\n\n\n\n\n\n0\n\n\n\n\n0\n1\n\n\n1\n2\n\n\n2\n3\n\n\n\n\n\n\n\nThe key thing to notice here is that the @ syntax really isn’t doing anything magical. It’s just passing the function into the decorator and using that as the function definition. It’s just syntactic sugar for a higher order function that takes a function and returns a function.\nTo understand why this works, think through what our decorator is doing. 1. It’s a function that takes a function as an argument 2. It creates a new function called wrapper. This wrapper function called the argument passed into it, but also has other code. 3. It returns that function as the output\n\nprint_function_source(print_decorator)\n\ndef print_decorator(func):\n    def wrapper(*args, **kwargs):\n        print(f\"{datetime.now()}:{func}:args={args}:kwargs={kwargs}\")\n        return func(*args, **kwargs)\n    return wrapper"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#silly-simple-example-1",
+    "href": "shorts/Python/Python.html#silly-simple-example-1",
+    "title": "Python Programming Tips",
+    "section": "Silly Simple Example",
+    "text": "Silly Simple Example\n\nclass aClass: a = 2\n    \nclass bClass(aClass): pass\n    \naClass.a == bClass.a\n\nTrue"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#useful-examples",
+    "href": "shorts/Python/Python.html#useful-examples",
+    "title": "Python Programming Tips",
+    "section": "Useful Examples",
+    "text": "Useful Examples\nIn many cases there are common things we want to inherit in lots of classes. One example is having access to the date. Often you want this for logging, or printing, or any number of things. By subclassing you don’t have to reformat the date each time in your classes.\n\nclass DateMinuteMixin:\n    date_format='%Y%m%d_%H%M%S'\n    dte = datetime.now()\n\n    @property\n    def date_str(self): return self.dte.strftime(self.date_format)\n\nAnother handy use is to have generic behavior for handling different file types. In this case, we have a mixin where it opens and reads a sql file. Rather than rewriting this code for every class that needs to read a sql file, you can inherit from a class when you need that functionality.\n\n\n\n\n\n\nTip\n\n\n\nYou can define an abstract property like below to let users know that after inheriting this class, they need to define that property. In this case, they define the sql_filepath, and they get the contents of the file for free via the other methods.\n\n\n\nimport abc\n\nclass SqlFileMixin:\n    @abc.abstractproperty\n    def sql_filepath(self):\n        pass\n\n    @property\n    def sql_file(self):\n        return open(self.sql_filepath)\n\n    @property\n    def query(self):\n        return self.sql_file.read()"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#silly-simple-example-2",
+    "href": "shorts/Python/Python.html#silly-simple-example-2",
+    "title": "Python Programming Tips",
+    "section": "Silly Simple Example",
+    "text": "Silly Simple Example\n\ndef mapper(items,fn):\n    for item in items: yield item\n\n\nit = mapper([2,4,6,8],square)\nit\n\n&lt;generator object mapper&gt;\n\n\n\nnext(it), next(it), next(it)\n\n(2, 4, 6)\n\n\nYou can also process it sequentially in a loop.\n\nfor item in mapper([2,4,6,8],square): \n    print(item)\n\n2\n4\n6\n8"
+  },
+  {
+    "objectID": "shorts/Python/Python.html#useful-example-1",
+    "href": "shorts/Python/Python.html#useful-example-1",
+    "title": "Python Programming Tips",
+    "section": "Useful Example",
+    "text": "Useful Example\n\nFile Streaming\n\nprint_plus = partial(print,end='\\n++++++\\n')\n\nwith open('test.txt', 'rb') as f:\n    iterator = iter(partial(f.read, 64), b'')\n    print_plus(type(iterator))\n    for block in iterator: print_plus(block)\n\n&lt;class 'callable_iterator'&gt;\n++++++\nb'one\\ntwo\\nthree\\nfour\\nfive\\nsix\\nseven\\neight\\nnine\\nten\\neleven\\ntwelve\\nt'\n++++++\nb'hirteen\\nninety nine thousand nine hundred ninety\\nninety nine tho'\n++++++\nb'usand nine hundred ninety one\\nninety nine thousand nine hundred '\n++++++\nb'ninety two\\nninety nine thousand nine hundred ninety three\\nninety'\n++++++\nb' nine thousand nine hundred ninety four\\nninety nine thousand nin'\n++++++\nb'e hundred ninety five\\nninety nine thousand nine hundred ninety s'\n++++++\nb'ix\\nninety nine thousand nine hundred ninety seven\\nninety nine th'\n++++++\nb'ousand nine hundred ninety eight\\nninety nine thousand nine hundr'\n++++++\nb'ed ninety nine\\n'\n++++++"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "listing": "/index.html",
+    "items": [
+      "/posts/my-first-post/my-first-post.html",
+      "/posts/post-with-code/index.html",
+      "/posts/welcome/index.html",
+      "/posts/Python/Python.html"
+    ]
+  },
+  {
+    "listing": "/shorts/index.html",
+    "items": [
+      "/shorts/First/First.html",
+      "/shorts/Python/Python.html"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "index.qmd": {
+    "index.html": "e97bd743"
+  },
+  "about.qmd": {
+    "about.html": "22d85a23"
+  },
+  "posts/welcome/index.qmd": {
+    "index.html": "8c2d1846"
+  },
+  "posts/post-with-code/index.qmd": {
+    "index.html": "3083a831"
+  },
+  "posts/my-first-post/2024-08-15-my-first-post.ipynb": {
+    "2024-08-15-my-first-post.html": "e7cdbacc"
+  },
+  "posts/Python/Python.ipynb": {
+    "Python.html": "df63a765"
+  },
+  "posts/my-first-post/my-first-post.ipynb": {
+    "my-first-post.html": "129531b3"
+  },
+  "shorts/index.qmd": {
+    "index.html": "11085430"
+  },
+  "shorts/Python/Python.ipynb": {
+    "Python.html": "8839222c"
+  },
+  "shorts/First/First.ipynb": {
+    "First.html": "2891d6e2"
+  }
+}

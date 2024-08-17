@@ -1,0 +1,71 @@
+project:
+  type: website
+
+execute:
+  freeze: true
+
+website:
+  title: "<i class='fas fa-home'></i>"
+  navbar:
+    # background: "#C45508"
+    left: 
+      - text: "Blog"
+        href: /
+      - text: "Shorts"
+        href: shorts/
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/pzktit
+
+format:
+  html:
+    theme: lumen
+    mainfont: "Playfair Display, Georgia, serif"
+    headingfont: "Marhey, Arial, sans-serif"
+    monofont: "Fira Code, Monaco, monospace"
+    # css: styles.css
+    code-fold: true
+    code-summary: "Code"
+    code-overflow: wrap
+    highlight-style: oblivion
+    include-in-header:
+      - text: |
+          <!-- Load fonts from Google Fonts -->
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Marhey:wght@400;700&family=Fira+Code:wght@400;700&display=swap">
+          <style>
+            /* Apply Marhey to all headings */
+            h2, h3, h4, h5, h6 {
+              font-family: 'Marhey', Arial, sans-serif;
+              font-weight: 400; /* Optional: bold for titles */
+            }
+            /* Apply Marhey to titles specifically */
+            h1 {
+              font-family: 'Marhey', Arial, sans-serif;
+              font-weight: 700; /* Optional: bold for titles */
+              font-size: 2em; /* Adjust size as needed */
+            }            
+            /* Apply Marhey to titles specifically */
+            span.menu-text {
+              font-family: 'Marhey', Arial, sans-serif;
+              font-weight: 700; /* Optional: bold for titles */
+            }            
+            /* Apply Fira Code to code elements */
+            code, pre {
+              font-family: 'Fira Code', Monaco, monospace;
+            }
+          </style>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+          <!-- Additional custom styles -->
+          <style>
+          /* Optional: Customize icon appearance */
+          <style>
+            .fa-home {
+              font-size: 24px; /* Adjust size as needed */
+              color: #000; /* Change color if needed */
+              vertical-align: middle; /* Align icon with text */
+            }
+          </style>
+
+
+
